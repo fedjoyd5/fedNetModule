@@ -11,11 +11,11 @@ namespace clientTest
     {
         static void Main(string[] args)
         {
-            FedNetClient theClient = new FedNetClient(new ConnectorData("127.0.0.1", 4620, "test", false, "test"), new ConsoleLogger());
+            FedNetClient theClient = new FedNetClient(new ConnectorData("127.0.0.1", 4620, "test", true, "test"), new ConsoleLogger());
             theClient.MessageReceived += TheClient_MessageReceived;
             theClient.Connect();
             Console.ReadLine();
-            theClient.sendMessage(new List<string>() { "request", "list", "player" }, "ALL");
+            theClient.sendMessage(new List<string>() { "request", "list", "client" }, "ALL");
             Console.ReadLine();
             theClient.Disconnect();
             Console.ReadLine();
