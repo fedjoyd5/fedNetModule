@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fedNet", "fedNet\fedNet.csproj", "{1BE85DA8-20B7-441E-B158-7C6FBBCC4EB7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestClient", "clientTest\TestClient.csproj", "{6959696A-B81F-462D-B281-FE20194031B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestServer", "serverTest\TestServer.csproj", "{57462A79-0C3D-4510-94DC-6DFC85DD10A0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1BE85DA8-20B7-441E-B158-7C6FBBCC4EB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BE85DA8-20B7-441E-B158-7C6FBBCC4EB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BE85DA8-20B7-441E-B158-7C6FBBCC4EB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BE85DA8-20B7-441E-B158-7C6FBBCC4EB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6959696A-B81F-462D-B281-FE20194031B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6959696A-B81F-462D-B281-FE20194031B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6959696A-B81F-462D-B281-FE20194031B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6959696A-B81F-462D-B281-FE20194031B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57462A79-0C3D-4510-94DC-6DFC85DD10A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57462A79-0C3D-4510-94DC-6DFC85DD10A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57462A79-0C3D-4510-94DC-6DFC85DD10A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57462A79-0C3D-4510-94DC-6DFC85DD10A0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
