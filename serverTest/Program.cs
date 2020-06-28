@@ -33,7 +33,9 @@ namespace serverTest
             theLogger.Info(e.ClientID + " send message" + (e.ListTopic.Count > 0 ? " on '" + FedNetWorker.getTopicByList(e.ListTopic) + "' " : " ") + "(" + e.Payload.Length + " bytes)");
             if (e.ListTopic.Count > 2)
             {
-                if(e.ListTopic[0] == "request" && e.ListTopic[1] == "list" && e.ListTopic[2] == "player" && e.getStringPayload() == "ALL") { theServer.sendMessage(e.ClientID, "listPlayer", FedNetWorker.getTopicByList(theServer.getListClient(), "|")); }
+                if(e.ListTopic[0] == "request" && e.ListTopic[1] == "list" && e.ListTopic[2] == "client" && e.getStringPayload() == "ALL") {
+                    theServer.sendMessage(e.ClientID, "listClient", FedNetWorker.getTopicByList(theServer.getListClient(), "|"));
+                }
             }
         }
     }
@@ -67,8 +69,15 @@ namespace serverTest
 
     public class Athentificateur : IAuthenticator
     {
-        public bool CanConnect() { return true; }
+        public bool CantConnect() { return false; }
         public bool NeedAthentification() { return false; }
+
+        public void WhoWillBeCheck(string theUsername) { }
+
+        public bool DontExist(string theUsername)
+        {
+            return false;
+        }
 
         public bool Check(string theUsername, string thePassword)
         {
