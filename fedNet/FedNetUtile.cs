@@ -21,8 +21,11 @@ namespace fedNet
     }
     public interface IAuthenticator
     {
-        bool CanConnect();
+        bool CantConnect();
         bool NeedAthentification();
+
+        void WhoWillBeCheck(string theUsername);
+        bool DontExist(string theUsername);
         bool IsBanned(string theUsername);
         bool Check(string theUsername, string thePassword);
     }
@@ -206,7 +209,8 @@ namespace fedNet
             List <string> toRet = new List<string>();
             for(int inder = 0; inder < theList.Count; inder++)
             {
-                toRet.Add(theList[inder].Username);
+                if(theList[inder].Username != null) { toRet.Add(theList[inder].Username); }
+                else { toRet.Add("unknow-client-" + inder.ToString()); }
             }
             return toRet;
         }

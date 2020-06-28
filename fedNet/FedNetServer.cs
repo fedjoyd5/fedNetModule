@@ -120,10 +120,13 @@ namespace fedNet
 
         public Task ValidateConnectionAsync(MqttConnectionValidatorContext context)
         {
-            if (!_theAuthenticator.CanConnect()) { context.ReasonCode = MqttConnectReasonCode.ServerUnavailable; return Task.Delay(1); }
+            if (_theAuthenticator.CantConnect()) { context.ReasonCode = MqttConnectReasonCode.ServerUnavailable; return Task.Delay(1); }
             if (_theAuthenticator.NeedAthentification()) {
                 if (context.Username == "" || context.Password == "") { context.ReasonCode = MqttConnectReasonCode.NotAuthorized; return Task.Delay(1); }
                 if (ClientData.IndexOfUsername(_theClientList, context.Username) != -1) { context.ReasonCode = MqttConnectReasonCode.QuotaExceeded; return Task.Delay(1); }
+
+                _theAuthenticator.WhoWillBeCheck(context.Username);
+                if (_theAuthenticator.DontExist(context.Username)) { context.ReasonCode = MqttConnectReasonCode.BadUserNameOrPassword; return Task.Delay(1); }
                 if (_theAuthenticator.IsBanned(context.Username)) { context.ReasonCode = MqttConnectReasonCode.Banned; return Task.Delay(1); }
                 if (!_theAuthenticator.Check(context.Username, context.Password)) { context.ReasonCode = MqttConnectReasonCode.BadUserNameOrPassword; return Task.Delay(1); }
             }
@@ -160,9 +163,9 @@ namespace fedNet
 
         // ---------- simple message ----------
 
-        public bool sendMessage(string ClientID, List<string> lisTopic, string Data, MessagePriority priority = FedNetConstante.DEFAULT_PRIORITY) { return sendMessage(ClientID, lisTopic, Encoding.ASCII.GetBytes(Data), priority); }
+        public bool sendMessage(string ClientID, List<string> lisTopic, string Data, MessagePriority priority = FedNetConstante.DEFAULT_PRIORITY) { return sendMessage(ClientID, lisTopic, (Data != null ? Encoding.ASCII.GetBytes(Data) : Encoding.ASCII.GetBytes("error data")), priority); }
         public bool sendMessage(string ClientID, List<string> lisTopic, byte[] Data, MessagePriority priority = FedNetConstante.DEFAULT_PRIORITY) { return sendMessage(ClientID, FedNetWorker.getTopicByList(lisTopic), Data, priority); }
-        public bool sendMessage(string ClientID, string theTopic, string Data, MessagePriority priority = FedNetConstante.DEFAULT_PRIORITY) { return sendMessage(ClientID, theTopic, Encoding.ASCII.GetBytes(Data), priority); }
+        public bool sendMessage(string ClientID, string theTopic, string Data, MessagePriority priority = FedNetConstante.DEFAULT_PRIORITY) { return sendMessage(ClientID, theTopic, (Data != null ? Encoding.ASCII.GetBytes(Data) : Encoding.ASCII.GetBytes("error data")), priority); }
         public bool sendMessage(string ClientID, string theTopic, byte[] Data, MessagePriority priority = FedNetConstante.DEFAULT_PRIORITY)
         {
             if (!_theGameServer.IsStarted) { return false; }

@@ -36,9 +36,9 @@ namespace fedNet
 
             _theGameClient = new MqttFactory().CreateMqttClient();
             _theGameClient.UseDisconnectedHandler(e => {
-                _logSystem.Info("Disconnected !!");
+                _logSystem.Info("Disconnected (reason : " + (e.AuthenticateResult != null ? e.AuthenticateResult.ResultCode.ToString() : "unknow") + ")");
                 if (reconnectOnDisco) {
-                    Task.Delay(100).Wait();
+                    Task.Delay(1000).Wait();
                     Connect();
                 }
             });
@@ -64,6 +64,7 @@ namespace fedNet
             _ClientConfiguration = new MqttClientOptionsBuilder();
             _ClientConfiguration.WithClientId(String.Format("{0}-{1}_{2}", MQTTConnectorData.Username, DateTime.Now.ToString("ffffmmHHss"), FedNetWorker.getRandomString(10)));
             if (MQTTConnectorData.useCreditential) { _ClientConfiguration.WithCredentials(MQTTConnectorData.Username, MQTTConnectorData.Password); }
+            if (!MQTTConnectorData.useCreditential) { _ClientConfiguration.WithCredentials(MQTTConnectorData.Username, ""); }
             _ClientConfiguration.WithTcpServer(MQTTConnectorData.Host, MQTTConnectorData.Port);
 
             _logSystem.Info("MQTT Client reinitialized !");
