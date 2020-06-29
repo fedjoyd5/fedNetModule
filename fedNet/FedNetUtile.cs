@@ -25,6 +25,7 @@ namespace fedNet
         bool NeedAthentification();
 
         void WhoWillBeCheck(string theUsername);
+        int MaxConnection(string theUsername);
         bool DontExist(string theUsername);
         bool IsBanned(string theUsername);
         bool Check(string theUsername, string thePassword);
@@ -195,22 +196,38 @@ namespace fedNet
             }
             return ret;
         }
-        public static int IndexOfUsername(List<ClientData> theList, string theUsername)
+        public static List<int> IndexOfUsername(List<ClientData> theList, string theUsername)
         {
-            int ret = -1;
+            List<int> ret = new List<int>();
             for (int i = 0; i < theList.Count; i++)
             {
-                if (theList[i].Username == theUsername) { ret = i; }
+                if (theList[i].Username == theUsername) { ret.Add(i); }
             }
             return ret;
         }
-        public static List<string> getListUsername(List<ClientData> theList)
+        public static List<string> getListUsername(List<ClientData> theList, bool withIndexCount = false, string indexSeparatorChar = "-")
         {
             List <string> toRet = new List<string>();
-            for(int inder = 0; inder < theList.Count; inder++)
+            Dictionary<string, int> IndexCount = new Dictionary<string, int>();
+            for (int inder = 0; inder < theList.Count; inder++)
             {
-                if(theList[inder].Username != null) { toRet.Add(theList[inder].Username); }
-                else { toRet.Add("unknow-client-" + inder.ToString()); }
+                if (theList[inder].Username != null) {
+                    if (withIndexCount) {
+                        int curInd = 0;
+                        if (IndexCount.TryGetValue(theList[inder].Username, out curInd)) {
+                            toRet.Add(theList[inder].Username + indexSeparatorChar + curInd);
+                            IndexCount[theList[inder].Username] = (curInd + 1);
+                        } else {
+                            toRet.Add(theList[inder].Username + indexSeparatorChar + 0);
+                            IndexCount.Add(theList[inder].Username, 1);
+                        }
+                    } else {
+                        toRet.Add(theList[inder].Username);
+                    }
+                }
+                if (theList[inder].Username == null) {
+                    toRet.Add("unknow-client(ERRORatIndex:" + inder + ")");
+                }
             }
             return toRet;
         }

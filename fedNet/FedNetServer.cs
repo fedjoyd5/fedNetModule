@@ -123,12 +123,18 @@ namespace fedNet
             if (_theAuthenticator.CantConnect()) { context.ReasonCode = MqttConnectReasonCode.ServerUnavailable; return Task.Delay(1); }
             if (_theAuthenticator.NeedAthentification()) {
                 if (context.Username == "" || context.Password == "") { context.ReasonCode = MqttConnectReasonCode.NotAuthorized; return Task.Delay(1); }
-                if (ClientData.IndexOfUsername(_theClientList, context.Username) != -1) { context.ReasonCode = MqttConnectReasonCode.QuotaExceeded; return Task.Delay(1); }
 
                 _theAuthenticator.WhoWillBeCheck(context.Username);
                 if (_theAuthenticator.DontExist(context.Username)) { context.ReasonCode = MqttConnectReasonCode.BadUserNameOrPassword; return Task.Delay(1); }
+                if (ClientData.IndexOfUsername(_theClientList, context.Username).Count >= _theAuthenticator.MaxConnection(context.Username) && _theAuthenticator.MaxConnection(context.Username) != -1) { context.ReasonCode = MqttConnectReasonCode.QuotaExceeded; return Task.Delay(1); }
                 if (_theAuthenticator.IsBanned(context.Username)) { context.ReasonCode = MqttConnectReasonCode.Banned; return Task.Delay(1); }
                 if (!_theAuthenticator.Check(context.Username, context.Password)) { context.ReasonCode = MqttConnectReasonCode.BadUserNameOrPassword; return Task.Delay(1); }
+            }
+            if (!_theAuthenticator.NeedAthentification()) {
+                if (context.Username == "") { context.ReasonCode = MqttConnectReasonCode.NotAuthorized; return Task.Delay(1); }
+
+                _theAuthenticator.WhoWillBeCheck(context.Username);
+                if (ClientData.IndexOfUsername(_theClientList, context.Username).Count >= _theAuthenticator.MaxConnection(context.Username) && _theAuthenticator.MaxConnection(context.Username) != -1) { context.ReasonCode = MqttConnectReasonCode.QuotaExceeded; return Task.Delay(1); }
             }
             if (context.ClientId.Length < 5 || ClientData.IndexOfClientID(_theClientList, context.ClientId) != -1) { context.ReasonCode = MqttConnectReasonCode.ClientIdentifierNotValid; return Task.Delay(1); }
 
@@ -196,13 +202,14 @@ namespace fedNet
             return true;
         }
 
-        // ---------- broadcast message ----------
+        // ---------- getter function ----------
 
-        public string getClientIDByUsername(string theUsername)
+        public string getClientIDByUsername(string theUsername, int theIndex)
         {
-            int theInd = ClientData.IndexOfUsername(_theClientList, theUsername);
-            if(theInd == -1) { return ""; }
-            return _theClientList[theInd].ClientID;
+            List<int> theInd = ClientData.IndexOfUsername(_theClientList, theUsername);
+            if(theInd.Count < 1) { return ""; }
+            if(theIndex >= theInd.Count || theIndex < 0) { return ""; }
+            return _theClientList[theInd[theIndex]].ClientID;
         }
         public string getUsernameByClientID(string theClientID)
         {
@@ -210,6 +217,6 @@ namespace fedNet
             if (theInd == -1) { return ""; }
             return _theClientList[theInd].Username;
         }
-        public List<string> getListClient() { return ClientData.getListUsername(_theClientList); }
+        public List<string> getListClient(bool withIndexCount = false, string indexSeparatorChar = "-") { return ClientData.getListUsername(_theClientList, withIndexCount, indexSeparatorChar); }
     }
 }
