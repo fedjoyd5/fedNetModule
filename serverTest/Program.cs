@@ -34,7 +34,7 @@ namespace serverTest
             if (e.ListTopic.Count > 2)
             {
                 if(e.ListTopic[0] == "request" && e.ListTopic[1] == "list" && e.ListTopic[2] == "client" && e.getStringPayload() == "ALL") {
-                    theServer.sendMessage(e.ClientID, "listClient", FedNetWorker.getTopicByList(theServer.getListClient(), "|"));
+                    theServer.sendMessage(e.ClientID, "listClient", FedNetWorker.getTopicByList(theServer.getListClient(true), "|"));
                 }
             }
         }
@@ -77,6 +77,10 @@ namespace serverTest
         public bool DontExist(string theUsername)
         {
             return false;
+        }
+        public int MaxConnection(string theUsername)
+        {
+            return 2;
         }
 
         public bool Check(string theUsername, string thePassword)
