@@ -8,6 +8,8 @@ using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Options;
 using MQTTnet.Protocol;
+using MQTTnet.Client.Disconnecting;
+using MQTTnet.Client.Connecting;
 
 namespace fedNet
 {
@@ -37,6 +39,7 @@ namespace fedNet
             _theGameClient = new MqttFactory().CreateMqttClient();
             _theGameClient.UseDisconnectedHandler(e => {
                 _logSystem.Info("Disconnected (reason : " + (e.AuthenticateResult != null ? e.AuthenticateResult.ResultCode.ToString() : "unknow") + ")");
+                if(Disconnected != null) { Disconnected.Invoke(this, e); }
                 if (reconnectOnDisco) {
                     Task.Delay(1000).Wait();
                     Connect();
@@ -46,6 +49,7 @@ namespace fedNet
                 _logSystem.Info("Connected !!");
                 _theGameClient.SubscribeAsync(FedNetConstante.SERVER_TO_CLIENT + FedNetConstante.DEFAULT_TOPIC_SEPARATOR + ClientId + FedNetConstante.DEFAULT_TOPIC_SEPARATOR + FedNetConstante.DEFAULT_TOPIC_JOKER, (MqttQualityOfServiceLevel)FedNetConstante.PRIORITY_SERVER_TO_CLIENT);
                 _theGameClient.SubscribeAsync(FedNetConstante.SERVER_BROADCAST + FedNetConstante.DEFAULT_TOPIC_SEPARATOR + FedNetConstante.DEFAULT_TOPIC_JOKER, (MqttQualityOfServiceLevel)FedNetConstante.PRIORITY_SERVER_BROADCAST);
+                if(Connected != null) { Connected.Invoke(this, e); }
             });
             _theGameClient.UseApplicationMessageReceivedHandler(e => {
                 if (MessageReceived != null) { MessageReceived.Invoke(this, Message.getMessage(e.ApplicationMessage)); }
@@ -105,6 +109,8 @@ namespace fedNet
         public bool tryReconnect { get { return reconnectOnDisco; } }
 
         public event EventHandler<Message> MessageReceived;
+        public event EventHandler<EventArgs> Connected;
+        public event EventHandler<EventArgs> Disconnected;
 
         public bool sendMessage(List<string> lisTopic, string Data, MessagePriority priority = FedNetConstante.DEFAULT_PRIORITY) { return sendMessage(lisTopic, Encoding.ASCII.GetBytes(Data), priority); }
         public bool sendMessage(List<string> lisTopic, byte[] Data, MessagePriority priority = FedNetConstante.DEFAULT_PRIORITY) { return sendMessage(FedNetWorker.getTopicByList(lisTopic), Data, priority); }
