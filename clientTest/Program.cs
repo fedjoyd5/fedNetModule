@@ -13,12 +13,24 @@ namespace clientTest
         {
             FedNetClient theClient = new FedNetClient(new ConnectorData("127.0.0.1", 4620, "test", true, "test"), new ConsoleLogger());
             theClient.MessageReceived += TheClient_MessageReceived;
+            theClient.Connected += TheClient_Connected;
+            theClient.Disconnected += TheClient_Disconnected;
             theClient.Connect();
             Console.ReadLine();
             theClient.sendMessage(new List<string>() { "request", "list", "client" }, "ALL");
             Console.ReadLine();
             theClient.Disconnect();
             Console.ReadLine();
+        }
+
+        private static void TheClient_Disconnected(object sender, EventArgs e)
+        {
+            Console.WriteLine("disconnected !!");
+        }
+
+        private static void TheClient_Connected(object sender, EventArgs e)
+        {
+            Console.WriteLine("connected !!");
         }
 
         private static void TheClient_MessageReceived(object sender, Message e)
