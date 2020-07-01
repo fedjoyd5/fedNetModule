@@ -52,6 +52,7 @@ namespace fedNet
                 if(Connected != null) { Connected.Invoke(this, e); }
             });
             _theGameClient.UseApplicationMessageReceivedHandler(e => {
+                if (e.ClientId == "" || e.ClientId == " " || e.ClientId == null) { return; }
                 if (MessageReceived != null) { MessageReceived.Invoke(this, Message.getMessage(e.ApplicationMessage)); }
             });
 
@@ -74,8 +75,9 @@ namespace fedNet
             _logSystem.Info("MQTT Client reinitialized !");
         }
 
-        public void Connect()
+        public void Connect(bool force = true)
         {
+            reconnectOnDisco = force;
             IMqttClientOptions theOpt = _ClientConfiguration.Build();
             _theGameClient.ConnectAsync(theOpt);
             _logSystem.Info(String.Format("Start connection to '{0}:{1}' ...", _MQTTHostAndPort.Host, _MQTTHostAndPort.Port.ToString()));
@@ -107,6 +109,7 @@ namespace fedNet
         public string ClientId { get { if(_theGameClient.IsConnected) { return _theGameClient.Options.ClientId; } return ""; } }
         public bool IsConnected { get { return _theGameClient.IsConnected; } }
         public bool tryReconnect { get { return reconnectOnDisco; } }
+        public void EnableTryReconnect(bool newReconnectOnDisco = true) { reconnectOnDisco = newReconnectOnDisco; }
 
         public event EventHandler<Message> MessageReceived;
         public event EventHandler<EventArgs> Connected;

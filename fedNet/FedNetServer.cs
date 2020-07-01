@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using MQTTnet;
 using MQTTnet.Server;
 using MQTTnet.Protocol;
+using MQTTnet.Server.Status;
 
 namespace fedNet
 {
@@ -41,6 +42,7 @@ namespace fedNet
             _theClientList = new List<ClientData>();
             _theGameServer = new MqttFactory().CreateMqttServer();
             _theGameServer.UseApplicationMessageReceivedHandler(e => {
+                if (e.ClientId == "" || e.ClientId == " " || e.ClientId == null) { return; }
                 if (MessageReceived != null) { MessageReceived.Invoke(this, Message.getMessage(e.ApplicationMessage)); }
             });
             _theGameServer.UseClientConnectedHandler(e => {
@@ -98,7 +100,7 @@ namespace fedNet
             if(!context.ApplicationMessage.Topic.StartsWith(FedNetConstante.CLIENT_TO_SERVER + FedNetConstante.DEFAULT_TOPIC_SEPARATOR + context.ClientId) && context.ClientId != _theGameServer.Options.ClientId) {
                 context.AcceptPublish = false;
                 /*context.CloseConnection = true;*/
-                _logSystem.Warn(context.ClientId + " try to publish on topic : " + context.ApplicationMessage.Topic);
+                _logSystem.Warn(context.ClientId + " try to publish " + context.ApplicationMessage.Payload.Length + " bytes on topic : " + context.ApplicationMessage.Topic);
                 return Task.Delay(1);
             }
             context.AcceptPublish = true;
@@ -200,6 +202,22 @@ namespace fedNet
             theMsgBuilder.WithPayload(Data);
             _theGameServer.PublishAsync(theMsgBuilder.Build());
             return true;
+        }
+
+        // ---------- moderation function ----------
+
+        public async Task<bool> KickClientAsync(string ClientID)
+        {
+            bool toRet = false;
+            foreach(IMqttClientStatus stat in await _theGameServer.GetClientStatusAsync())
+            {
+                if(stat.ClientId == ClientID)
+                {
+                    await stat.DisconnectAsync();
+                    toRet = true;
+                }
+            }
+            return toRet;
         }
 
         // ---------- getter function ----------
